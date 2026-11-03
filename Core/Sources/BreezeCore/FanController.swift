@@ -13,6 +13,7 @@ public struct ControlStatus: Codable, Sendable {
     public let preset: FanPreset
     public let message: String?
     public let restoring: Bool
+    public var installation: HelperInstallation? = nil
 }
 
 public final class FanController {
@@ -20,6 +21,7 @@ public final class FanController {
     public private(set) var message: String?
     private let hardware: any FanHardware
     private var configuration = PresetConfiguration.defaults(for: .performance)
+    private var controlTemperature: Double?
     private var owner: UUID?
     private var deadline: TimeInterval = 0
     private var controlledFans: Set<Int> = []
@@ -57,11 +59,14 @@ public final class FanController {
         do {
             let snapshot = try hardware.snapshot()
             guard !snapshot.fans.isEmpty else { throw FanError.unavailable("No fan available.") }
+            let previous = requested == preset && curve == self.configuration ? controlTemperature : nil
+            let temperature = curve.controlTemperature(measured: snapshot.temperature, previous: previous)
             for fan in snapshot.fans {
-                guard let target = requested.target(in: fan.limits, temperature: snapshot.temperature, configuration: curve) else { continue }
+                guard let target = requested.target(in: fan.limits, temperature: temperature, configuration: curve) else { continue }
                 controlledFans.insert(fan.id)
                 try hardware.setTarget(fan: fan, rpm: target)
             }
+            controlTemperature = temperature
             self.configuration = curve
             owner = session
             preset = requested
@@ -117,6 +122,7 @@ public final class FanController {
         recovering = false
         owner = nil
         preset = .standard
+        controlTemperature = nil
         restoring = false
     }
 }

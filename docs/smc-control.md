@@ -16,7 +16,7 @@ A concessão do cliente começa depois da aplicação inicial. Uma recuperação
 
 As mensagens agora distinguem `open`, `read`, `write` e `enumerate`. Isso permite separar uma leitura recusada de uma falha ao reativar o modo manual. A consulta de metadados antes da escrita ainda pode falhar como `read`; `write` identifica o comando de escrita propriamente dito.
 
-Outro controlador pode alterar o estado entre operações. Sua presença em uma captura não comprova interferência. A curva atual é linear; histerese para reduzir oscilações de RPM é um assunto separado da recusa na chave de modo.
+Outro controlador pode alterar o estado entre operações. Sua presença em uma captura não comprova interferência. A curva linear agora usa histerese configurável para reduzir oscilações de RPM durante o resfriamento. Isso não comprova nem resolve, por si só, a causa da recusa na chave de modo.
 
 ## Referências e limites
 

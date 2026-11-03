@@ -10,9 +10,9 @@ Controle de ventoinhas para macOS, direto na barra de menus. Interface em portug
 
 - Mostra rotação das ventoinhas e a maior temperatura disponível nos sensores de CPU/GPU.
 - Oferece três presets: **Automático**, **Performance** e **Performance+**.
-- Permite ajustar rotação inicial, temperatura de início da curva e temperatura de rotação máxima nos dois presets personalizados.
+- Permite ajustar rotação inicial, temperaturas da curva e margem de resfriamento nos dois presets personalizados.
 - Salva os ajustes e o último preset escolhido.
-- Tem uma janela de ajustes com inicialização junto ao login e desativação do serviço.
+- Tem ajustes dentro do próprio painel, com prévia da curva, inicialização junto ao login e desativação do serviço.
 - Usa a cor turquesa de forma consistente, com aparência clara e escura.
 
 O app fica somente na barra de menus, sem ícone permanente no Dock. O idioma segue a preferência do macOS; você também pode escolher um idioma por aplicativo em **Ajustes do Sistema → Geral → Idioma e Região → Aplicativos**.
@@ -25,16 +25,6 @@ O app fica somente na barra de menus, sem ícone permanente no Dock. O idioma se
 
 A compatibilidade depende do hardware. Este projeto não usa uma API pública da Apple para controlar ventoinhas. Os testes automatizados usam hardware simulado e não garantem funcionamento em todos os modelos.
 
-## Instalação
-
-Baixe o ZIP na página de [releases](https://github.com/paulorsv01/breeze/releases), extraia e mova **Breeze.app** para **Aplicativos** antes de ativar o serviço. Evite mover o app enquanto o serviço estiver registrado.
-
-O binário deste primeiro release usa um certificado **Apple Development pessoal**, e **não é notarizado**. O macOS pode impedir a abertura ou exigir aprovação manual. Ele não oferece a mesma experiência de instalação de um app distribuído com Developer ID e notarização. Compilar e assinar localmente é outra opção.
-
-O identificador do app é `com.breeze.fancontrol`; o serviço usa `com.breeze.fancontrol.Helper`.
-
-Se você já usa uma versão local com outro identificador, desative o controle e encerre essa versão antes de abrir esta. As preferências da versão antiga não são migradas.
-
 ## Presets
 
 | Preset | Padrão de fábrica |
@@ -43,9 +33,11 @@ Se você já usa uma versão local com outro identificador, desative o controle 
 | Performance | 60% da rotação máxima até 40 °C; cresce linearmente até 100% em 75 °C |
 | Performance+ | 100% da rotação máxima |
 
-Nos Ajustes, os botões −/+ alteram cada parâmetro. A rotação inicial pode variar de 30% a 100%; o início da curva, de 30 a 65 °C; e a rotação máxima, de 50 a 85 °C. Há sempre pelo menos 5 °C entre início e fim da curva. Os limites físicos de cada ventoinha prevalecem sobre o percentual configurado.
+Nos Ajustes, selecione o preset e use os sliders ou botões −/+ para alterar cada parâmetro. O gráfico mostra as curvas de aquecimento e resfriamento. A rotação inicial pode variar de 30% a 100%; o início da curva, de 30 a 65 °C; e a rotação máxima, de 50 a 85 °C. Há sempre pelo menos 5 °C entre início e fim da curva. Os limites físicos de cada ventoinha prevalecem sobre o percentual configurado.
 
-A edição de um preset ativo tenta aplicar a nova configuração imediatamente. **Restaurar padrões** recupera os valores de fábrica daquele preset. Uma temperatura indisponível ou inválida leva à rotação máxima enquanto um preset personalizado está ativo.
+A margem de resfriamento começa em 5 °C e pode variar de 0 a 10 °C. Pequenas quedas de temperatura mantêm a rotação; depois de ultrapassar essa margem, a rotação diminui gradualmente. O aquecimento continua podendo elevar a rotação sem espera adicional. Por exemplo, após atingir 60 °C com margem de 5 °C, a curva mantém o alvo até 55 °C e começa a reduzi-lo abaixo disso. Margem zero desativa a histerese.
+
+As alterações ficam em rascunho até clicar em **Salvar presets**. Salvar uma curva ativa tenta aplicá-la uma vez; arrastar os controles não envia comandos às ventoinhas. **Restaurar este preset** recupera os valores de fábrica no rascunho. Com mínimo em 100%, o preset mantém rotação máxima e oculta os controles de temperatura. Uma temperatura indisponível ou inválida leva à rotação máxima enquanto um preset personalizado está ativo.
 
 ## Proteções do controle
 
@@ -55,19 +47,25 @@ Quando o app sai, desconecta ou deixa de renovar essa concessão, o serviço ten
 
 Para remover o app, use **Ajustes → Desativar controle**, encerre o Breeze e só então remova o aplicativo.
 
-## Compilar
+## Compilar e instalar
 
 Instale o Xcode com suporte a Swift 6 e o [XcodeGen](https://github.com/yonaskolb/XcodeGen). O projeto Xcode é gerado a partir de `project.yml`; não há dependências externas de runtime.
 
-Escolha explicitamente seu certificado:
+Clone o projeto e escolha seu certificado de assinatura:
 
 ```sh
+git clone git@github.com:paulorsv01/breeze.git
+cd breeze
 security find-identity -v -p codesigning
 SIGNING_IDENTITY='<fingerprint do seu certificado>' CONFIGURATION=Release \
   bash script/build_and_run.sh --build-only
 ```
 
 O script não escolhe certificados automaticamente. Ele compila o app e o helper, assina ambos e verifica suas assinaturas. O pacote fica em `build/DerivedData/Build/Products/Release/Breeze.app`.
+
+Mova **Breeze.app** para **Aplicativos** e abra por lá antes de habilitar o controle. Na primeira vez, autorize o serviço em **Ajustes do Sistema → Geral → Itens de Início e Extensões**.
+
+Para atualizar, encerre o Breeze e substitua o pacote inteiro em Aplicativos. Ao abrir, ele verifica o helper, gerencia a atualização do serviço e retoma o preset salvo. Sair do app mantém a preferência de controle habilitado; **Desativar controle** nos Ajustes a desliga. Veja os detalhes do [ciclo de vida do serviço](docs/helper-updates.md).
 
 Para compilar e abrir em modo Debug, use o mesmo comando sem `--build-only`. O script também oferece `--debug`, `--logs` e `--telemetry`.
 

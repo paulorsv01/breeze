@@ -1,6 +1,14 @@
 import BreezeCore
 import Foundation
 import OSLog
+import MachO
+
+private let runningInstallation: HelperInstallation? = {
+    guard let path = _dyld_get_image_name(0) else { return nil }
+    let executable = URL(fileURLWithPath: String(cString: path))
+    let bundle = executable.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    return try? HelperInstallation(bundleURL: bundle)
+}()
 
 private let logger = Logger(subsystem: HelperIdentity.helperID, category: "control")
 
@@ -46,7 +54,9 @@ final class HelperSession: NSObject, BreezeHelperProtocol {
     }
 
     private func respond(_ reply: (Data?, String?) -> Void) {
-        do { reply(try JSONEncoder().encode(controller.status), nil) }
+        var status = controller.status
+        status.installation = runningInstallation
+        do { reply(try JSONEncoder().encode(status), nil) }
         catch { reply(nil, error.localizedDescription) }
     }
 }
@@ -68,6 +78,7 @@ final class HelperDelegate: NSObject, NSXPCListenerDelegate {
 }
 
 do {
+    _ = runningInstallation
     guard geteuid() == 0 else {
         throw FanError.unavailable("This service must be started by macOS as a LaunchDaemon.")
     }

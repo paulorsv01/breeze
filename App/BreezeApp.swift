@@ -4,16 +4,16 @@ import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    var store: FanStore?
+    let store = FanStore()
     private var terminating = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        store.start()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard !terminating else { return .terminateLater }
-        guard let store else { return .terminateNow }
         guard !store.busy else { return .terminateCancel }
         terminating = true
         Task {
@@ -28,28 +28,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct BreezeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @State private var store = FanStore()
 
     var body: some Scene {
         MenuBarExtra {
-            FanMenuView(store: store)
-                .onAppear { delegate.store = store }
+            FanMenuView(store: delegate.store)
         } label: {
-            Label {
-                Text("Breeze")
-            } icon: {
-                Image("MenuBarIcon").renderingMode(.template)
-            }
-                .help("Breeze · \(store.preset.title) · \(store.rpmLabel) RPM")
-                .task {
-                    delegate.store = store
-                    store.start()
-                }
+            BreezeMenuLabel(store: delegate.store)
         }
         .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsView(store: store)
-        }
     }
 }

@@ -1,6 +1,29 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Adjust the curve below. Changes apply when you save.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust the curve below. Changes apply when you save."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajusta la curva. Los cambios se aplican al guardar."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajuste a curva abaixo. As mudanças são aplicadas ao salvar."
+          }
+        }
+      }
+    },
     "Allow Breeze in Login Items \u0026 Extensions in System Settings.": {
       "extractionState": "manual",
       "localizations": {
@@ -47,6 +70,29 @@
         }
       }
     },
+    "At 100%, this preset always runs at maximum speed. Lower the minimum to use a temperature curve.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At 100%, this preset always runs at maximum speed. Lower the minimum to use a temperature curve."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al 100%, este perfil mantiene la velocidad máxima. Reduce la velocidad inicial para usar una curva de temperatura."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em 100%, este preset mantém a rotação máxima. Reduza a rotação inicial para usar uma curva de temperatura."
+          }
+        }
+      }
+    },
     "Automatic": {
       "extractionState": "manual",
       "localizations": {
@@ -89,6 +135,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "O modo automático é gerenciado pelo macOS. Os presets respeitam os limites do hardware e usam rotação máxima se a temperatura estiver indisponível."
+          }
+        }
+      }
+    },
+    "Automatic mode stays with macOS. Presets always respect each fan’s limits.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic mode stays with macOS. Presets always respect each fan’s limits."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS sigue gestionando el modo automático. Los perfiles respetan los límites de cada ventilador."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O automático continua com o macOS. Os presets respeitam os limites de cada ventoinha."
+          }
+        }
+      }
+    },
+    "Back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volver"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voltar"
           }
         }
       }
@@ -162,6 +254,52 @@
         }
       }
     },
+    "Cooling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cooling"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enfriando"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esfriando"
+          }
+        }
+      }
+    },
+    "Cooling margin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cooling margin"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Margen para reducir"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Margem para reduzir"
+          }
+        }
+      }
+    },
     "Could not confirm automatic mode: %@": {
       "extractionState": "manual",
       "localizations": {
@@ -231,6 +369,28 @@
         }
       }
     },
+    "Could not restore automatic mode before updating the service.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not restore automatic mode before updating the service."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo restaurar el modo automático antes de actualizar el servicio."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível restaurar o modo automático antes de atualizar o serviço."
+          }
+        }
+      }
+    },
     "Could not verify the app signature.": {
       "extractionState": "manual",
       "localizations": {
@@ -254,6 +414,75 @@
         }
       }
     },
+    "Customize your presets": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customize your presets"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personaliza tus perfiles"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalize seus presets"
+          }
+        }
+      }
+    },
+    "Decrease %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decrease %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reducir %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminuir %@"
+          }
+        }
+      }
+    },
+    "Direction": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direction"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dirección"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Direção"
+          }
+        }
+      }
+    },
     "Disable fan control": {
       "extractionState": "manual",
       "localizations": {
@@ -273,6 +502,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Desativar controle"
+          }
+        }
+      }
+    },
+    "Discard changes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard changes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar cambios"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar alterações"
+          }
+        }
+      }
+    },
+    "Discard unsaved preset changes?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard unsaved preset changes?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Descartar los cambios sin guardar de los perfiles?"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descartar as alterações não salvas dos presets?"
           }
         }
       }
@@ -484,6 +759,29 @@
         }
       }
     },
+    "Increase %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Increase %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar %@"
+          }
+        }
+      }
+    },
     "Invalid RPM limits.": {
       "extractionState": "manual",
       "localizations": {
@@ -645,6 +943,29 @@
         }
       }
     },
+    "Keep editing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep editing"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seguir editando"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuar editando"
+          }
+        }
+      }
+    },
     "Managed by macOS.": {
       "extractionState": "manual",
       "localizations": {
@@ -783,6 +1104,29 @@
         }
       }
     },
+    "Off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desligada"
+          }
+        }
+      }
+    },
     "Open at login": {
       "extractionState": "manual",
       "localizations": {
@@ -875,6 +1219,52 @@
         }
       }
     },
+    "Preset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preset"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preset"
+          }
+        }
+      }
+    },
+    "Preset curve": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preset curve"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Curva del perfil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Curva do preset"
+          }
+        }
+      }
+    },
     "Presets": {
       "extractionState": "manual",
       "localizations": {
@@ -894,6 +1284,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Presets"
+          }
+        }
+      }
+    },
+    "Presets saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presets saved"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfiles guardados"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presets salvos"
           }
         }
       }
@@ -1059,6 +1472,29 @@
         }
       }
     },
+    "Restore this preset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore this preset"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar este perfil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restaurar este preset"
+          }
+        }
+      }
+    },
     "Restoring…": {
       "extractionState": "manual",
       "localizations": {
@@ -1197,6 +1633,29 @@
         }
       }
     },
+    "Save presets": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save presets"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar perfiles"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar presets"
+          }
+        }
+      }
+    },
     "Service files are missing. Reinstall the app.": {
       "extractionState": "manual",
       "localizations": {
@@ -1243,6 +1702,52 @@
         }
       }
     },
+    "Speed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotação"
+          }
+        }
+      }
+    },
+    "Speed increases immediately as the Mac warms up. Small temperature drops hold the current speed; cooling beyond this margin gradually slows the fans.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speed increases immediately as the Mac warms up. Small temperature drops hold the current speed; cooling beyond this margin gradually slows the fans."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La velocidad puede subir al calentarse el Mac. Las pequeñas bajadas mantienen la velocidad; al enfriarse más allá de este margen, disminuye gradualmente."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A rotação pode subir assim que o Mac aquece. Pequenas quedas de temperatura mantêm a rotação; ao esfriar além desta margem, ela diminui gradualmente."
+          }
+        }
+      }
+    },
     "Start increasing at": {
       "extractionState": "manual",
       "localizations": {
@@ -1262,6 +1767,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Começar a acelerar em"
+          }
+        }
+      }
+    },
+    "Temperature": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temperature"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temperatura"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temperatura"
           }
         }
       }
@@ -1312,6 +1840,28 @@
         }
       }
     },
+    "The service update could not be confirmed. Reopen Breeze to retry.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service update could not be confirmed. Reopen Breeze to retry."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo confirmar la actualización del servicio. Vuelve a abrir Breeze para reintentar."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível confirmar a atualização do serviço. Reabra o Breeze para tentar novamente."
+          }
+        }
+      }
+    },
     "This Mac does not expose compatible fan control.": {
       "extractionState": "manual",
       "localizations": {
@@ -1335,6 +1885,51 @@
         }
       }
     },
+    "Unsaved changes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsaved changes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambios sin guardar"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alterações não salvas"
+          }
+        }
+      }
+    },
+    "Updating fan control…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updating fan control…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizando control de ventiladores…"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atualizando controle das ventoinhas…"
+          }
+        }
+      }
+    },
     "Waiting for automatic mode.": {
       "extractionState": "manual",
       "localizations": {
@@ -1354,6 +1949,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aguardando retorno ao automático."
+          }
+        }
+      }
+    },
+    "Warming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warming"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calentando"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquecendo"
           }
         }
       }

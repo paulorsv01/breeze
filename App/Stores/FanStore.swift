@@ -5,11 +5,11 @@ import ServiceManagement
 
 @MainActor @Observable
 final class FanStore {
-    enum ServiceState { case notRegistered, needsApproval, enabled, unavailable }
+    enum ServiceState { case checking, notRegistered, needsApproval, enabled, unavailable }
 
     private(set) var snapshot: FanSnapshot?
     private(set) var preset: FanPreset = .standard
-    private(set) var serviceState: ServiceState = .notRegistered
+    private(set) var serviceState: ServiceState = .checking
     private(set) var busy = false
     private(set) var connectionReady = false
     private(set) var restoring = false
@@ -18,6 +18,12 @@ final class FanStore {
     private(set) var loginEnabled = false
     private let reader = SensorReader()
     private let helper = HelperClient()
+    private let updater = HelperUpdater()
+    private var expectedInstallation: HelperInstallation?
+    private var serviceVerified = false
+    private var attemptedRegistration = false
+    private var controlRevision = 0
+    private(set) var updatingService = false
     private let service = SMAppService.daemon(plistName: HelperIdentity.plistName)
     private let defaults: UserDefaults
     private(set) var configurations: [String: PresetConfiguration] = [:]
@@ -53,6 +59,14 @@ final class FanStore {
     private func refresh() async {
         loginEnabled = SMAppService.mainApp.status == .enabled
         refreshServiceState()
+        if defaults.object(forKey: "fanControlEnabled") == nil, serviceState == .enabled {
+            defaults.set(true, forKey: "fanControlEnabled")
+        }
+        if serviceState == .notRegistered, defaults.bool(forKey: "fanControlEnabled"),
+           !attemptedRegistration, !busy {
+            activateService()
+            return
+        }
         do { snapshot = try await reader.snapshot(); sensorError = nil }
         catch { snapshot = nil; sensorError = error.localizedDescription }
         guard serviceState == .enabled else {
@@ -61,9 +75,20 @@ final class FanStore {
             return
         }
         guard !busy else { return }
+        let revision = controlRevision
         do {
-            let status = try await helper.heartbeat()
-            guard !busy, !Task.isCancelled else { return }
+            let status: ControlStatus?
+            if serviceVerified {
+                status = try await helper.heartbeat()
+            } else {
+                busy = true
+                defer { busy = false }
+                status = try await ensureCurrentService()
+            }
+            guard let status, !busy, !Task.isCancelled, revision == controlRevision else { return }
+            guard status.installation == expectedInstallation else {
+                throw FanError.unavailable("The service update could not be confirmed. Reopen Breeze to retry.")
+            }
             preset = status.preset
             restoring = status.restoring
             connectionReady = true
@@ -75,9 +100,40 @@ final class FanStore {
                 await apply(selected)
             }
         } catch {
+            guard !busy, !Task.isCancelled, revision == controlRevision else { return }
             connectionReady = false
             controlError = error.localizedDescription
         }
+    }
+
+    private func ensureCurrentService() async throws -> ControlStatus? {
+        if expectedInstallation == nil {
+            expectedInstallation = try HelperInstallation(bundleURL: Bundle.main.bundleURL)
+        }
+        guard let expectedInstallation else { return nil }
+        let current = try? await helper.heartbeat(timeout: 2)
+        updatingService = current?.installation != expectedInstallation
+        defer { updatingService = false }
+        let status = try await updater.reconcile(
+            expected: expectedInstallation, current: current,
+            restore: { try await self.helper.restore() },
+            register: {
+                self.helper.invalidate()
+                try await self.service.unregister()
+                do { try self.service.register() }
+                catch {
+                    self.refreshServiceState()
+                    if self.serviceState == .needsApproval { return false }
+                    throw error
+                }
+                self.refreshServiceState()
+                return self.serviceState == .enabled
+            },
+            probe: { try await self.helper.heartbeat(timeout: 2) },
+            wait: { try await Task.sleep(for: .seconds($0)) }
+        )
+        serviceVerified = status != nil
+        return status
     }
 
     private func refreshServiceState() {
@@ -98,6 +154,10 @@ final class FanStore {
     }
 
     func activateService() {
+        guard !busy else { return }
+        attemptedRegistration = true
+        defaults.set(true, forKey: "fanControlEnabled")
+        controlRevision += 1
         busy = true
         controlError = nil
         Task {
@@ -119,6 +179,7 @@ final class FanStore {
 
     func select(_ selected: FanPreset) {
         guard canControl else { return }
+        controlRevision += 1
         startupPreset = nil
         busy = true
         controlError = nil
@@ -147,27 +208,38 @@ final class FanStore {
         configurations[preset.rawValue] ?? .defaults(for: preset)
     }
 
-    func save(_ configuration: PresetConfiguration, for selected: FanPreset) {
-        guard !busy, !restoring else { return }
+    @discardableResult
+    func save(_ presets: [FanPreset: PresetConfiguration]) -> Bool {
+        guard !busy, !restoring else { return false }
         do {
-            try configuration.validate()
             var updated = configurations
-            updated[selected.rawValue] = configuration
+            for (preset, configuration) in presets where preset != .standard {
+                try configuration.validate()
+                updated[preset.rawValue] = configuration
+            }
+            let activeChanged = (updated[preset.rawValue] ?? .defaults(for: preset)) != configuration(for: preset)
             defaults.set(try JSONEncoder().encode(updated), forKey: "presetConfigurations")
             configurations = updated
-            if preset == selected && canControl { select(selected) }
-        } catch { controlError = error.localizedDescription }
+            if activeChanged && canControl { select(preset) }
+            return true
+        } catch {
+            controlError = error.localizedDescription
+            return false
+        }
     }
 
-    func toggleLogin() {
+    func setLoginEnabled(_ enabled: Bool) {
+        guard enabled != (SMAppService.mainApp.status == .enabled) else { return }
         do {
-            if SMAppService.mainApp.status == .enabled { try SMAppService.mainApp.unregister() }
-            else { try SMAppService.mainApp.register() }
+            if enabled { try SMAppService.mainApp.register() }
+            else { try SMAppService.mainApp.unregister() }
             loginEnabled = SMAppService.mainApp.status == .enabled
         } catch { controlError = error.localizedDescription }
     }
 
     func removeService() {
+        guard !busy else { return }
+        controlRevision += 1
         busy = true
         Task {
             defer { busy = false }
@@ -175,7 +247,9 @@ final class FanStore {
                 _ = try await helper.restore()
                 helper.invalidate()
                 try await service.unregister()
+                defaults.set(false, forKey: "fanControlEnabled")
                 connectionReady = false
+                serviceVerified = false
                 serviceState = .notRegistered
                 preset = .standard
                 controlError = nil

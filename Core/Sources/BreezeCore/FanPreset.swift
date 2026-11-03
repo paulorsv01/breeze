@@ -8,8 +8,7 @@ public enum FanPreset: String, CaseIterable, Codable, Identifiable, Sendable {
         guard self != .standard else { return nil }
         let curve = configuration ?? .defaults(for: self)
         guard let temperature, temperature.isFinite else { return limits.maximum }
-        let progress = min(1, max(0, (temperature - curve.startTemperature) / (curve.fullTemperature - curve.startTemperature)))
-        let fraction = curve.minimumFraction + (1 - curve.minimumFraction) * progress
+        let fraction = curve.fraction(at: temperature)
         return min(limits.maximum, max(limits.minimum, limits.maximum * fraction))
     }
 }

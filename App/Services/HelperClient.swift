@@ -28,8 +28,8 @@ final class HelperClient {
         return try await request { proxy, reply in proxy.applyPreset(preset.rawValue, configuration: data, reply: reply) }
     }
 
-    func heartbeat() async throws -> ControlStatus {
-        try await request { proxy, reply in proxy.heartbeat(reply: reply) }
+    func heartbeat(timeout: TimeInterval = 15) async throws -> ControlStatus {
+        try await request(timeout: timeout) { proxy, reply in proxy.heartbeat(reply: reply) }
     }
 
     func restore() async throws -> ControlStatus {
@@ -52,6 +52,7 @@ final class HelperClient {
     }
 
     private func request(
+        timeout: TimeInterval = 15,
         _ send: (any BreezeHelperProtocol, @escaping (Data?, String?) -> Void) -> Void
     ) async throws -> ControlStatus {
         let connection = try connect()
@@ -59,7 +60,7 @@ final class HelperClient {
             return try await withCheckedThrowingContinuation { continuation in
                 let gate = ReplyGate(continuation)
                 // Firmware may take up to ten seconds to release system mode.
-                DispatchQueue.global().asyncAfter(deadline: .now() + 15) {
+                DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
                     gate.finish(.failure(FanError.unavailable("The service did not respond. Try again.")))
                 }
                 guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in

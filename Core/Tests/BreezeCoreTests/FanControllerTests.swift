@@ -277,3 +277,40 @@ private final class TestHardware: FanHardware {
     #expect(!controller.status.restoring)
     #expect(controller.preset == .standard)
 }
+
+@Test func performanceHoldsRPMThroughSmallTemperatureOscillations() throws {
+    let hardware = try TestHardware()
+    let controller = FanController(hardware: hardware)
+    let curve = PresetConfiguration(minimumFraction: 0.4, startTemperature: 40, fullTemperature: 80, hysteresis: 5)
+    hardware.temperature = 60
+    try controller.apply(.performance, owner: UUID(), now: 0, configuration: curve)
+    #expect(hardware.targets[0] == 3500)
+    for temperature in [59.0, 60, 58, 55] {
+        hardware.temperature = temperature
+        controller.tick(now: 1)
+        #expect(hardware.targets[0] == 3500)
+    }
+    hardware.temperature = 54
+    controller.tick(now: 2)
+    #expect(abs(try #require(hardware.targets[0]) - 3425) < 0.001)
+    hardware.temperature = 70
+    controller.tick(now: 3)
+    #expect(abs(try #require(hardware.targets[0]) - 4250) < 0.001)
+}
+
+@Test func changingCurveOrReturningFromAutomaticResetsHysteresis() throws {
+    let hardware = try TestHardware()
+    let controller = FanController(hardware: hardware)
+    let owner = UUID()
+    var curve = PresetConfiguration(minimumFraction: 0.4, startTemperature: 40, fullTemperature: 80)
+    hardware.temperature = 80
+    try controller.apply(.performance, owner: owner, now: 0, configuration: curve)
+    hardware.temperature = 60
+    curve.hysteresis = 10
+    try controller.apply(.performance, owner: owner, now: 1, configuration: curve)
+    #expect(hardware.targets[0] == 3500)
+    try controller.apply(.standard, owner: owner, now: 2)
+    hardware.temperature = 40
+    try controller.apply(.performance, owner: owner, now: 3, configuration: curve)
+    #expect(hardware.targets[0] == 2000)
+}
