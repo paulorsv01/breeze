@@ -1,0 +1,58 @@
+name: Breeze
+options:
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  BreezeCore:
+    path: Core
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: YES
+    ENABLE_APP_SANDBOX: NO
+    COMBINE_HIDPI_IMAGES: YES
+targets:
+  Breeze:
+    type: application
+    platform: macOS
+    sources: [App, Shared, Resources/AppIcon.icns, Resources/Assets.xcassets, Resources/Localizable.xcstrings]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.breeze.fancontrol
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Resources/Info.plist
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+        ENABLE_DEBUG_DYLIB: NO
+    dependencies:
+      - package: BreezeCore
+      - target: BreezeHelper
+        embed: false
+    postCompileScripts:
+      - name: Embed privileged service
+        basedOnDependencyAnalysis: false
+        script: |
+          set -eu
+          mkdir -p "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/HelperTools"
+          mkdir -p "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons"
+          cp "$BUILT_PRODUCTS_DIR/BreezeHelper" "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/HelperTools/BreezeHelper"
+          cp "$SRCROOT/Resources/com.breeze.fancontrol.Helper.plist" "$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LaunchDaemons/"
+    scheme:
+      build:
+        targets:
+          Breeze: all
+  BreezeHelper:
+    type: tool
+    platform: macOS
+    sources: [Helper, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.breeze.fancontrol.Helper
+        CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: BreezeCore
