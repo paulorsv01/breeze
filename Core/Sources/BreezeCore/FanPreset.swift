@@ -54,14 +54,18 @@ public struct FanSnapshot: Codable, Sendable {
     }
 }
 
+public enum SMCOperation: String, Sendable {
+    case open, read, write, enumerate
+}
+
 public enum FanError: LocalizedError {
-    case smc(key: String, code: Int32)
+    case smc(key: String, code: Int32, operation: SMCOperation)
     case invalidReading(String)
     case unavailable(String)
 
     public var errorDescription: String? {
         switch self {
-        case let .smc(key, code): "SMC · \(key): error 0x\(String(UInt32(bitPattern: code), radix: 16))."
+        case let .smc(key, code, operation): "SMC · \(key) · \(operation.rawValue): error 0x\(String(UInt32(bitPattern: code), radix: 16))."
         case let .invalidReading(message), let .unavailable(message): message
         }
     }

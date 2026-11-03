@@ -58,7 +58,8 @@ final class HelperClient {
         do {
             return try await withCheckedThrowingContinuation { continuation in
                 let gate = ReplyGate(continuation)
-                DispatchQueue.global().asyncAfter(deadline: .now() + 4) {
+                // Firmware may take up to ten seconds to release system mode.
+                DispatchQueue.global().asyncAfter(deadline: .now() + 15) {
                     gate.finish(.failure(FanError.unavailable("The service did not respond. Try again.")))
                 }
                 guard let proxy = connection.remoteObjectProxyWithErrorHandler({ error in

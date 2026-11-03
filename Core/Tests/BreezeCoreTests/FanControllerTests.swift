@@ -7,6 +7,9 @@ private final class TestHardware: FanHardware {
     var failTarget: Int?
     var failAutomatic: Set<Int> = []
     var failReading = false
+    var failRelease = false
+    var controlReleased = false
+    var onTarget: (() -> Void)?
     var manual: Set<Int> = []
     var targets: [Int: Double] = [:]
     var restored: [Int] = []
@@ -25,6 +28,12 @@ private final class TestHardware: FanHardware {
         }, temperature: temperature)
     }
 
+    func releaseControl(recovering: Bool) throws {
+        #expect(manual.isEmpty)
+        if failRelease { throw FanError.unavailable("Release failed") }
+        controlReleased = true
+    }
+
     func setAutomatic(fan id: Int) throws {
         if failAutomatic.contains(id) { throw FanError.unavailable("Restauração falhou.") }
         manual.remove(id)
@@ -35,6 +44,7 @@ private final class TestHardware: FanHardware {
         manual.insert(fan.id)
         if failTarget == fan.id { throw FanError.unavailable("Escrita falhou depois de ativar manual.") }
         targets[fan.id] = rpm
+        onTarget?()
     }
 }
 
@@ -231,4 +241,39 @@ private final class TestHardware: FanHardware {
     #expect(FanPreset.performance.target(in: limits, temperature: nil, configuration: curve) == 5000)
     #expect(FanPreset.performance.target(in: limits, temperature: .nan, configuration: curve) == 5000)
     #expect(FanPreset.standard.target(in: limits, temperature: 100, configuration: curve) == nil)
+}
+
+@Test func leaseStartsAfterSlowFirmwareHandshake() throws {
+    let hardware = try TestHardware()
+    let controller = FanController(hardware: hardware)
+    var time = 0.0
+    hardware.onTarget = { time = 10 }
+    try controller.apply(.performance, owner: UUID(), now: time)
+    #expect(controller.preset == .performance)
+    controller.tick(now: 17)
+    #expect(controller.preset == .performance)
+    controller.tick(now: 18)
+    #expect(controller.preset == .standard)
+    #expect(hardware.controlReleased)
+}
+
+@Test func unlockReleaseWaitsForEveryFanAndRetriesFailures() throws {
+    let hardware = try TestHardware(fanCount: 2)
+    let controller = FanController(hardware: hardware)
+    try controller.apply(.performance, owner: UUID(), now: 0)
+    hardware.failAutomatic = [1]
+    controller.tick(now: 8)
+    #expect(controller.status.restoring)
+    #expect(!hardware.controlReleased)
+    hardware.failAutomatic = []
+    hardware.failRelease = true
+    controller.tick(now: 9)
+    #expect(hardware.manual.isEmpty)
+    #expect(controller.status.restoring)
+    #expect(controller.preset == .performance)
+    hardware.failRelease = false
+    controller.tick(now: 10)
+    #expect(hardware.controlReleased)
+    #expect(!controller.status.restoring)
+    #expect(controller.preset == .standard)
 }

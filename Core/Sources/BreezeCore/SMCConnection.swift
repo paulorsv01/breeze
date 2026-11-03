@@ -4,10 +4,14 @@ import Foundation
 public final class SMCConnection {
     private var connection: UInt32 = 0
     private var temperatureKeys: [String]?
+    private lazy var manualControl = SMCManualControl(
+        read: { [unowned self] in try number($0) },
+        write: { [unowned self] in try write($0, number: $1) }
+    )
 
     public init() throws {
         let status = breeze_smc_open(&connection)
-        guard status == 0 else { throw FanError.smc(key: "AppleSMC", code: status) }
+        guard status == 0 else { throw FanError.smc(key: "AppleSMC", code: status, operation: .open) }
     }
 
     deinit { breeze_smc_close(connection) }
@@ -20,7 +24,7 @@ public final class SMCConnection {
         guard key.utf8.count == 4 else { throw FanError.invalidReading("Invalid SMC key.") }
         var value = BreezeSMCValue()
         let status = breeze_smc_read(connection, code(key), &value)
-        guard status == 0 else { throw FanError.smc(key: key, code: status) }
+        guard status == 0 else { throw FanError.smc(key: key, code: status, operation: .read) }
         return value
     }
 
@@ -32,7 +36,7 @@ public final class SMCConnection {
         case (code("flt "), 4):
             let bits = UInt32(bytes[0]) | UInt32(bytes[1]) << 8 | UInt32(bytes[2]) << 16 | UInt32(bytes[3]) << 24
             result = Double(Float(bitPattern: bits))
-        case (code("ui8 "), 1): result = Double(bytes[0])
+        case (code("ui8 "), 1), (code("flag"), 1): result = Double(bytes[0])
         case (code("ui16"), 2): result = Double(UInt16(bytes[0]) << 8 | UInt16(bytes[1]))
         case (code("ui32"), 4): result = Double(bytes.reduce(UInt32(0)) { ($0 << 8) | UInt32($1) })
         case (code("sp78"), 2): result = Double(Int16(bitPattern: UInt16(bytes[0]) << 8 | UInt16(bytes[1]))) / 256
@@ -49,20 +53,20 @@ public final class SMCConnection {
         case (code("flt "), 4):
             var bits = Float(number).bitPattern.littleEndian
             bytes = withUnsafeBytes(of: &bits, Array.init)
-        case (code("ui8 "), 1):
+        case (code("ui8 "), 1), (code("flag"), 1):
             guard number == 0 || number == 1 else { throw FanError.invalidReading("Invalid mode.") }
             bytes = [UInt8(number)]
         default: throw FanError.invalidReading("Unsupported write at \(key).")
         }
         withUnsafeMutableBytes(of: &value.bytes) { $0.copyBytes(from: bytes) }
         let status = breeze_smc_write(connection, code(key), &value)
-        guard status == 0 else { throw FanError.smc(key: key, code: status) }
+        guard status == 0 else { throw FanError.smc(key: key, code: status, operation: .write) }
     }
 
     private func modeKey(_ id: Int) throws -> String {
         for key in ["F\(id)Md", "F\(id)md"] {
             do { _ = try read(key); return key }
-            catch FanError.smc(_, let code) where code == 0x10084 { continue }
+            catch FanError.smc(_, let code, .read) where code == 0x10084 { continue }
         }
         throw FanError.unavailable("This Mac does not expose compatible fan control.")
     }
@@ -94,7 +98,7 @@ public final class SMCConnection {
             for index in 0..<UInt32(count) {
                 var key: UInt32 = 0
                 let status = breeze_smc_key_at(connection, index, &key)
-                guard status == 0 else { throw FanError.smc(key: "#KEY[\(index)]", code: status) }
+                guard status == 0 else { throw FanError.smc(key: "#KEY[\(index)]", code: status, operation: .enumerate) }
                 let bytes = [UInt8((key >> 24) & 255), UInt8((key >> 16) & 255), UInt8((key >> 8) & 255), UInt8(key & 255)]
                 let name = String(decoding: bytes, as: UTF8.self)
                 if name.hasPrefix("Tp") || name.hasPrefix("Tg") { keys.append(name) }
@@ -106,6 +110,8 @@ public final class SMCConnection {
             return value
         }.max()
     }
+
+    public func releaseControl(recovering: Bool) throws { try manualControl.release(recovering: recovering) }
 
     public func setAutomatic(fan id: Int) throws {
         guard (0...9).contains(id) else { throw FanError.invalidReading("Invalid fan.") }
@@ -121,7 +127,7 @@ public final class SMCConnection {
         }
         let key = try modeKey(fan.id)
         if try number(key) != 1 {
-            try write(key, number: 1)
+            try manualControl.enable(key: key)
             try confirmMode(key, automatic: false)
         }
         try write("F\(fan.id)Tg", number: rpm)

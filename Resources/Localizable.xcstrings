@@ -1128,6 +1128,52 @@
         }
       }
     },
+    "SMC did not release fan control. Restoration will be retried.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMC did not release fan control. Restoration will be retried."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMC no liberó el control de los ventiladores. Se volverá a intentar la restauración."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O SMC não liberou o controle das ventoinhas. A restauração será tentada novamente."
+          }
+        }
+      }
+    },
+    "SMC did not release system mode. Restoring automatic mode.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMC did not release system mode. Restoring automatic mode."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMC no liberó el modo sistema. Restaurando el modo automático."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O SMC não liberou o modo sistema. Retornando ao automático."
+          }
+        }
+      }
+    },
     "SMC unavailable.": {
       "extractionState": "manual",
       "localizations": {

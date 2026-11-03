@@ -98,3 +98,7 @@ As traduções ficam em `Resources/Localizable.xcstrings`. Mensagens técnicas d
 ## Licença
 
 [MIT](LICENSE), © 2026 Paulo Vieira.
+
+## Erros do SMC durante Performance
+
+Uma falha na atualização da curva faz o Breeze retornar ao automático por segurança. O [diagnóstico do controle SMC](docs/smc-control.md) explica a recuperação condicional do modo manual, os dados úteis para novos relatos e os limites da validação por hardware.
